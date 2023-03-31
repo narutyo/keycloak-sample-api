@@ -41,4 +41,13 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public static function extractFromToken($token, $secret)
+    {
+        $data = JWT::decode($token, new Key($secret, 'HS256'));
+        if (!optional($data)->user_id) {
+            throw new \Exception('Invalid Token');
+        }
+        return self::find(optional($data)->user_id);
+    }
 }
